@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bson.Document;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -62,8 +64,7 @@ public class WebScrapTest
         return new Object[][]
         {
                 { "https://amazon.com" },
-                { "https://www.flipkart.com" },
-                { "https://walmart.com" } };
+                { "https://www.flipkart.com" } };
     }
 
     @Test(dataProvider = "getWebData")
@@ -73,9 +74,35 @@ public class WebScrapTest
         String url = driver.getCurrentUrl();
         String title = driver.getTitle();
 
+        // Links-Count
+        int totalLinks = driver.findElements(By.tagName("a")).size();
+        int imagesLinks = driver.findElements(By.tagName("img")).size();
+
+        List<WebElement> linkList = driver.findElements(By.tagName("a"));
+        List<String> linkAttrList = new ArrayList<String>();
+
+        List<WebElement> imageList = driver.findElements(By.tagName("img"));
+        List<String> imgAttrList = new ArrayList<String>();
+
         Document d1 = new Document();
         d1.append("url", url);
         d1.append("title", title);
+        d1.append("totalLinks", totalLinks);
+        d1.append("imagesLinks", imagesLinks);
+
+        for (WebElement link : linkList)
+        {
+            String hrefValue = link.getAttribute("href");
+            linkAttrList.add(hrefValue);
+        }
+        d1.append("linkAttrList", linkAttrList);
+
+        for (WebElement link : imageList)
+        {
+            String srcValue = link.getAttribute("src");
+            imgAttrList.add(srcValue);
+        }
+        d1.append("linkAttrList", imgAttrList);
 
         List<Document> docList = new ArrayList<Document>();
         docList.add(d1);
